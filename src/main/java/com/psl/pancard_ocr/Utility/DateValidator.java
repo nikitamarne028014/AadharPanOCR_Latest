@@ -1,10 +1,13 @@
-package com.psl.pancard_ocr.Service;
+package com.psl.pancard_ocr.Utility;
 
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class DateValidator {
 
 	 public static String dateValidatorRE = "(3[01]|[12][0-9]|0[1-9])/(1[0-2]|0[1-9])/[1-9][0-9][0-9][0-9]$";
@@ -30,6 +33,7 @@ public class DateValidator {
 	        return true;
 	    }
 	 
+	 //This function is not used
 	 public static Date getBirthDate(String validatedDate)
 	 {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

@@ -1,9 +1,5 @@
 package com.psl.pancard_ocr.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.psl.pancard_ocr.DTO.PanCardDetails;
+import com.psl.pancard_ocr.Util.PanOcrConstants;
+import com.psl.pancard_ocr.Utility.DateValidator;
 import com.psl.pancard_ocr.Utility.JSONArrayGenerator;
 
 @Service
@@ -27,13 +25,18 @@ public class PanOcrServiceImpl {
 	
 	@Autowired
 	JSONArrayGenerator jsonArrayGenerator;
-			
+	
+	@Autowired
+	DateValidator validator;
+	
+	@Autowired
+	static PanOcrConstants constants;
+    
 	public PanCardDetails getPanCardDetails(MultipartFile fileToBeParsed){
 
 		//JSON parser object to parse read file
 		JSONParser jsonParser = new JSONParser();
-		DateValidator validator = new DateValidator();
-		String panCardValidatorRE = "[A-Z]{5}\\d{4}[A-Z]{1}";
+		
 		ArrayList<String> name = new ArrayList<String>();
 		ArrayList<Long> topValue = new ArrayList<Long>();
 		ArrayList<Long> heightValue = new ArrayList<Long>();
@@ -70,15 +73,15 @@ public class PanOcrServiceImpl {
 
 					if(validator.isValidDate(text))
 					{
-						System.out.println("BirthDate is: "+text);
-						panCardDetails.setDOB(text);
+						System.out.println("BirthDate is: "+text.trim());
+						panCardDetails.setDOB(text.trim());
 						
 					}
 						
-					if(text.matches(panCardValidatorRE))
+					if(text.matches(constants.PAN_CARD_VALIDATOR_REGEX))
 					{
-						System.out.println("Pan Card Number is: "+text);
-						panCardDetails.setPanNumber(text);
+						System.out.println("Pan Card Number is: "+text.trim());
+						panCardDetails.setPanNumber(text.trim());
 						break;
 					}
 
@@ -94,36 +97,36 @@ public class PanOcrServiceImpl {
 				}
 			}
 
-			/* System.out.println("List of name is: "+name);
+			 System.out.println("List of name is: "+name);
             System.out.println("Top values: "+topValue);
             System.out.println("Height values: "+heightValue);
-			 */
+			 
 			StringBuffer sb = new StringBuffer();
 			StringBuffer sb1 = new StringBuffer();
 			Long element1;
 			Long element2; 
 
-			for(int i=0,j=0;i<topValue.size()-1 && j<heightValue.size()-1;i++,j++)
+			for(int i=0,j=0;i<topValue.size() && j<heightValue.size();i++,j++)
 			{
 				element1 = topValue.get(i);
 				element2 = heightValue.get(j);
 
 				float difference = (((float)element1) / element2) ;
 
-				if(difference >= 6.20 && difference <=9.0){
+				if(difference >= constants.FIRSTNAME_MEAN_DIFFERENCE_MIN && difference <= constants.FIRSTNAME_MEAN_DIFFERENCE_MAX){
 					sb.append(name.get(i)+" ");
 				}
 
-				if(difference >=10 && difference <=12.50)
+				if(difference >=constants.LASTNAME_MEAN_DIFFERENCE_MIN && difference <= constants.LASTNAME_MEAN_DIFFERENCE_MAX)
 				{
 					sb1.append(name.get(i)+" ");
 				}
 			}
 			
-			System.out.println("Final Name is: "+sb.toString());
-			panCardDetails.setPanHolderName(sb.toString());
-			System.out.println("Fathers Name is: "+sb1.toString());
-			panCardDetails.setFathersName(sb1.toString());
+			System.out.println("Final Name is: "+sb.toString().trim());
+			panCardDetails.setPanHolderName(sb.toString().trim());
+			System.out.println("Fathers Name is: "+sb1.toString().trim());
+			panCardDetails.setFathersName(sb1.toString().trim());
 
 			}
 		} catch (ParseException e) {
@@ -141,7 +144,7 @@ public class PanOcrServiceImpl {
 	public static boolean hasSpecialCharacters(String text)
 	{
 		char[] textsChars = text.toCharArray();
-		Pattern specialCharacters = Pattern.compile ("[-!@$%&*()_+=|<>?{}\\[\\]~-�#.\"]");
+		Pattern specialCharacters = Pattern.compile(constants.SPECIAL_CHARS_REGEX);
 
 		for (Character ch : textsChars) {
 			Matcher hasSpecial = specialCharacters.matcher(ch.toString());
@@ -153,7 +156,6 @@ public class PanOcrServiceImpl {
 
 	public static boolean isPanNumber(String text)
 	{
-		String panCardValidatorRE = "[A-Z]{5}\\d{4}[A-Z]{1}";
 		boolean isMatchingPANCriteria = text.length()==10;
 		StringBuilder sb = new StringBuilder();
 		if(isMatchingPANCriteria)
@@ -231,6 +233,4 @@ public class PanOcrServiceImpl {
 			return false;
 
 	}
-
-
 }

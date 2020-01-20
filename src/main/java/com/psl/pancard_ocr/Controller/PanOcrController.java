@@ -1,6 +1,5 @@
 package com.psl.pancard_ocr.Controller;
 
-import java.io.File;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +36,12 @@ public class PanOcrController {
 	{
 		AadharCardDetails aadharCardDetails = aadharCardServiceImpl.getAadharCardDetails(fileToBeParsed);
 		return new ResponseEntity<AadharCardDetails>(aadharCardDetails, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/sayHello")
+	public void sayHello(@RequestParam("hello") String message)
+	{
+		System.out.println("Message received: "+message);
 	}
 	
 }

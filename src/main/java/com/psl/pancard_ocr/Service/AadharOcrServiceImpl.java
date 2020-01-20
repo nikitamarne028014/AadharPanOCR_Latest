@@ -1,7 +1,5 @@
 package com.psl.pancard_ocr.Service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.psl.pancard_ocr.DTO.AadharCardDetails;
+import com.psl.pancard_ocr.Util.AadharOcrConstants;
+import com.psl.pancard_ocr.Utility.DateValidator;
 import com.psl.pancard_ocr.Utility.JSONArrayGenerator;
 
 @Service
@@ -25,6 +25,10 @@ public class AadharOcrServiceImpl {
 	
 	@Autowired
 	JSONArrayGenerator jsonArrayGenerator;
+	
+	@Autowired
+	static AadharOcrConstants constants;
+	
 	
 	public AadharCardDetails getAadharCardDetails(MultipartFile fileToBeParsed){
 		
@@ -79,24 +83,24 @@ public class AadharOcrServiceImpl {
 						heightValue.add(height);
 					}
 					
-					if(text.equalsIgnoreCase("Female") || text.contains("Fem") || text.contains("male") 
-							|| text.equalsIgnoreCase("male"))
+					if(text.equalsIgnoreCase(constants.FEMALE) || text.contains("Fem") || text.contains("male") 
+							|| text.equalsIgnoreCase(constants.MALE))
 					{
-						if(text.equalsIgnoreCase("Female") || text.contains("Fem"))
+						if(text.equalsIgnoreCase(constants.FEMALE) || text.contains("Fem"))
 						{
-							System.out.println("Gender is : "+text);
-							aadharCardDetails.setGender(text);
+							System.out.println("Gender is : "+text.trim());
+							aadharCardDetails.setGender(text.trim());
 						}
-						else if(text.contains("Male") || text.equalsIgnoreCase("Male"))
+						else if(text.contains(constants.MALE) || text.equalsIgnoreCase(constants.MALE))
 						{
-							System.out.println("Gender is : "+text);
-							aadharCardDetails.setGender(text);
+							System.out.println("Gender is : "+text.trim());
+							aadharCardDetails.setGender(text.trim());
 						}
 					}
 					
-					if(validator.isValidDate(text))
+					if(validator.isValidDate(text.trim()))
 					{
-						System.out.println("BirthDate is: "+text); 
+						System.out.println("BirthDate is: "+text.trim()); 
 					}
 			
 				}
@@ -114,13 +118,13 @@ public class AadharOcrServiceImpl {
 				element2 = heightValue.get(j);
 				String text = name.get(i);
 		
-				if((text.length() == 4) && (text.chars().allMatch( Character::isDigit )))
+				if((text.length() == constants.LENGTH_OF_DIGITS) && (text.chars().allMatch( Character::isDigit )))
 					digits.add(text);
 					
 				float difference = (((float)element1) / element2) ;
 
-				if(difference >= 7 && difference <=12){
-					if((!(text.chars().anyMatch(Character :: isDigit))) && (!(text.equalsIgnoreCase("Male"))) && (!(text.equalsIgnoreCase("Female"))))
+				if(difference >= constants.MEAN_DIFFERENCE_MIN && difference <= constants.MEAN_DIFFERENCE_MAX){
+					if((!(text.chars().anyMatch(Character :: isDigit))) && (!(text.equalsIgnoreCase(constants.MALE))) && (!(text.equalsIgnoreCase(constants.FEMALE))))
 					{
 						shortListedName.add(text);
 						shortListedTopValue.add(element1);
@@ -137,6 +141,8 @@ public class AadharOcrServiceImpl {
 				
 			}
 			
+			System.out.println("ShortListed names: "+shortListedName);
+			System.out.println("top values: "+shortListedTopValue);
 		
 	
 			String FinalName = getName(shortListedName, shortListedTopValue);
@@ -147,7 +153,7 @@ public class AadharOcrServiceImpl {
 			aadharCardDetails.setCardHolderName(FinalName.trim());
 			//System.out.println("Aadhar Card Number is: "+sb1.toString());
 			
-			if(digits.size() == 4)
+			if(digits.size() == constants.LENGTH_OF_DIGITS)
 			{
 				for (int i = 0; i < digits.size(); i++) {
 					if(i==0)
@@ -179,7 +185,7 @@ public class AadharOcrServiceImpl {
 	public static boolean hasSpecialCharacters(String text)
 	{
 		char[] textsChars = text.toCharArray();
-		Pattern specialCharacters = Pattern.compile ("[-!@$%&*()_+=|<>?{}\\[\\]~-�#.\"]");
+		Pattern specialCharacters = Pattern.compile(constants.SPECIAL_CHARS_REGEX);
 
 		for (Character ch : textsChars) {
 			Matcher hasSpecial = specialCharacters.matcher(ch.toString());
@@ -202,6 +208,7 @@ public class AadharOcrServiceImpl {
 		Long element1;
 		Long element2;
 		Long difference;
+		Long difference2;
 		StringBuffer sb = new StringBuffer();
 		ArrayList<String> finalName = new ArrayList<String>();
 		
@@ -215,7 +222,10 @@ public class AadharOcrServiceImpl {
 			    element2 = topValues.get(i+1);
 			
 			difference = element1 - element2;
-			if(difference >= 0 && difference < 10)
+			difference2 = element2 - element1;
+			
+			if(difference >= constants.TOP_DIFFERENCE_MIN && difference < constants.TOP_DIFFERENCE_MAX 
+					|| difference2 >=constants.TOP_DIFFERENCE_MIN && difference2 <= constants.TOP_DIFFERENCE_MAX)
 			{
 				if(!(finalName.contains(name.get(j))))
 					finalName.add(name.get(j));
@@ -225,12 +235,13 @@ public class AadharOcrServiceImpl {
 				    finalName.add(name.get(j+1));
 			
 			}
+			
+			
 		}
 		for (String finalname : finalName) {
 			sb.append(finalname+" ");
 		}
 		return sb.toString().trim();
-		
-		
+			
 	}
 }

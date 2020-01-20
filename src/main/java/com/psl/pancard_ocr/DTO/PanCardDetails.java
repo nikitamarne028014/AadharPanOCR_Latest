@@ -1,7 +1,5 @@
 package com.psl.pancard_ocr.DTO;
 
-import java.util.Date;
-
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,8 +42,4 @@ public class PanCardDetails {
 				+ ", DOB=" + DOB + "]";
 	}
 
-	
-	
-	
-	
 }
