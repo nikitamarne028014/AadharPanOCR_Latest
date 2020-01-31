@@ -11,4 +11,6 @@ public class PanOcrConstants {
 	public static Double FIRSTNAME_MEAN_DIFFERENCE_MAX = 9.0;
 	public static Double LASTNAME_MEAN_DIFFERENCE_MIN = 10.0;
 	public static Double LASTNAME_MEAN_DIFFERENCE_MAX = 12.50;
+	public static Integer TOP_DIFFERENCE_MIN = 0;
+	public static Integer TOP_DIFFERENCE_MAX = 10;
 }

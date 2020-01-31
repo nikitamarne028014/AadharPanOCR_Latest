@@ -33,6 +33,8 @@ public class PanOcrServiceImpl {
 	static PanOcrConstants constants;
     
 	public PanCardDetails getPanCardDetails(MultipartFile fileToBeParsed){
+		
+		panCardDetails.reInitializePanObject();
 
 		//JSON parser object to parse read file
 		JSONParser jsonParser = new JSONParser();
@@ -40,6 +42,11 @@ public class PanOcrServiceImpl {
 		ArrayList<String> name = new ArrayList<String>();
 		ArrayList<Long> topValue = new ArrayList<Long>();
 		ArrayList<Long> heightValue = new ArrayList<Long>();
+		ArrayList<Long> shortListedFirstNameTopValue = new ArrayList<Long>();
+		ArrayList<String> shortListedFirstName = new ArrayList<String>();
+		ArrayList<Long> shortListedLastNameTopValue = new ArrayList<Long>();
+		ArrayList<String> shortListedLastName = new ArrayList<String>();
+		
 		String jsonResponse;
 		
 		try {
@@ -48,6 +55,12 @@ public class PanOcrServiceImpl {
 			
 			if(jsonResponse != null)
 			{
+				
+			//set image URL
+			String imgUrl = jsonArrayGenerator.getFilePathFromFolder(fileToBeParsed);	
+			panCardDetails.setImgUrl(imgUrl);
+			
+			
 			//Read JSON file
 			Object obj = jsonParser.parse(jsonResponse);
 			long top ;
@@ -71,6 +84,9 @@ public class PanOcrServiceImpl {
 				}
 				else {
 
+					if(hasSpecialCharacters(text.trim()))
+						continue;
+					
 					if(validator.isValidDate(text))
 					{
 						System.out.println("BirthDate is: "+text.trim());
@@ -84,9 +100,12 @@ public class PanOcrServiceImpl {
 						panCardDetails.setPanNumber(text.trim());
 						break;
 					}
+					else
+					{
+						isPanNumber(text);
+					}
 
-					if(hasSpecialCharacters(text.trim()))
-						continue;
+					
 
 					if(isUpperCase(text.trim()) && (!hasSpecialCharacters(text.trim())))
 					{
@@ -114,19 +133,26 @@ public class PanOcrServiceImpl {
 				float difference = (((float)element1) / element2) ;
 
 				if(difference >= constants.FIRSTNAME_MEAN_DIFFERENCE_MIN && difference <= constants.FIRSTNAME_MEAN_DIFFERENCE_MAX){
-					sb.append(name.get(i)+" ");
+					//sb.append(name.get(i)+" ");
+					shortListedFirstName.add(name.get(i));
+					shortListedFirstNameTopValue.add(topValue.get(i));
+					
 				}
 
 				if(difference >=constants.LASTNAME_MEAN_DIFFERENCE_MIN && difference <= constants.LASTNAME_MEAN_DIFFERENCE_MAX)
 				{
-					sb1.append(name.get(i)+" ");
+					//sb1.append(name.get(i)+" ");
+					shortListedLastName.add(name.get(i));
+					shortListedLastNameTopValue.add(topValue.get(i));
 				}
 			}
 			
-			System.out.println("Final Name is: "+sb.toString().trim());
-			panCardDetails.setPanHolderName(sb.toString().trim());
-			System.out.println("Fathers Name is: "+sb1.toString().trim());
-			panCardDetails.setFathersName(sb1.toString().trim());
+			String FirstName = getName(shortListedFirstName, shortListedFirstNameTopValue);
+			String LastName = getName(shortListedLastName, shortListedLastNameTopValue);
+			System.out.println("First Name is: "+FirstName);
+			panCardDetails.setPanHolderName(FirstName);
+			System.out.println("Fathers Name is: "+LastName);
+			panCardDetails.setFathersName(LastName);
 
 			}
 		} catch (ParseException e) {
@@ -154,11 +180,11 @@ public class PanOcrServiceImpl {
 		return false;
 	}
 
-	public static boolean isPanNumber(String text)
+	public boolean isPanNumber(String text)
 	{
 		boolean isMatchingPANCriteria = text.length()==10;
 		StringBuilder sb = new StringBuilder();
-		if(isMatchingPANCriteria)
+		if(isMatchingPANCriteria && !hasSpecialCharacters(text) && (text == text.toUpperCase()))
 		{
 			System.out.println("Pan criteria is matching");
 			String initialFiveAlphabets = text.substring(0,5);
@@ -225,12 +251,69 @@ public class PanOcrServiceImpl {
 				}
 			}
 
-			System.out.println("Correct pan number: "+sb.toString());
+			System.out.println("Correct pan number: "+sb.toString().trim());
+			if(sb.toString().trim().matches(constants.PAN_CARD_VALIDATOR_REGEX))
+			{
+				panCardDetails.setPanNumber(sb.toString().trim());
+			}
 			return true;
 
 		}
 		else
 			return false;
 
+	}
+	
+	public String getName(ArrayList<String> name, ArrayList<Long> topValues)
+	{
+		Long element1;
+		Long element2;
+		Long difference;
+		Long difference2;
+		StringBuffer sb = new StringBuffer();
+		ArrayList<String> finalName = new ArrayList<String>();
+		
+		System.out.println("Shortlisted name: "+name);
+		System.out.println("Shortlisted Top values: "+topValues);
+		
+		if(name.size() == 1)
+		{
+			finalName.add(name.get(0));
+		}
+		else{
+			for(int i=0,j=0; i<topValues.size() && j<name.size();i++,j++)
+			{
+				
+				element1 = topValues.get(i);
+				
+				if(i == topValues.size()-1)
+					break;
+				else
+				    element2 = topValues.get(i+1);
+				
+				difference = element1 - element2;
+				difference2 = element2 - element1;
+				
+				if(difference >= constants.TOP_DIFFERENCE_MIN && difference < constants.TOP_DIFFERENCE_MAX 
+						|| difference2 >=constants.TOP_DIFFERENCE_MIN && difference2 <= constants.TOP_DIFFERENCE_MAX)
+				{
+					if(!(finalName.contains(name.get(j))))
+						finalName.add(name.get(j));
+					
+					
+					if(!(finalName.contains(name.get(j+1))))
+					    finalName.add(name.get(j+1));
+				
+				}
+				
+				
+			}
+		}
+
+		for (String finalname : finalName) {
+			sb.append(finalname+" ");
+		}
+		return sb.toString().trim();
+			
 	}
 }

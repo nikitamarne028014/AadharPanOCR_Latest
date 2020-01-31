@@ -9,6 +9,7 @@ public class AadharCardDetails {
 	private String yearOfBirth;
 	private String gender;
 	private String AadharNumber;
+	private String imgUrl;
 	
 	public String getCardHolderName() {
 		return cardHolderName;
@@ -34,13 +35,26 @@ public class AadharCardDetails {
 	public void setAadharNumber(String aadharNumber) {
 		AadharNumber = aadharNumber;
 	}
-	
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
 	@Override
 	public String toString() {
 		return "AadharCardDetails [cardHolderName=" + cardHolderName
 				+ ", yearOfBirth=" + yearOfBirth + ", gender=" + gender
-				+ ", AadharNumber=" + AadharNumber + "]";
+				+ ", AadharNumber=" + AadharNumber + ", imgUrl=" + imgUrl + "]";
 	}
 	
-	
+	public void reInitializeAadharObject()
+	{
+		cardHolderName = null;
+		yearOfBirth = null;
+		gender = null;
+		AadharNumber = null;
+		imgUrl = null;
+	}
+
 }

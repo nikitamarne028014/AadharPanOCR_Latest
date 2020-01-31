@@ -9,6 +9,7 @@ public class PanCardDetails {
 	private String fathersName;
 	private String panNumber;
 	private String DOB;
+	private String imgUrl;
 	
 
 	public String getPanHolderName() {
@@ -35,11 +36,27 @@ public class PanCardDetails {
 	public void setDOB(String dOB) {
 		DOB = dOB;
 	}
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+	
 	@Override
 	public String toString() {
 		return "PanCardDetails [panHolderName=" + panHolderName
 				+ ", fathersName=" + fathersName + ", panNumber=" + panNumber
-				+ ", DOB=" + DOB + "]";
+				+ ", DOB=" + DOB + ", imgUrl=" + imgUrl + "]";
+	}
+	
+	public void reInitializePanObject()
+	{
+		panHolderName = null;
+		fathersName = null;
+		panNumber = null;
+		DOB = null;
+		imgUrl = null;
 	}
 
 }

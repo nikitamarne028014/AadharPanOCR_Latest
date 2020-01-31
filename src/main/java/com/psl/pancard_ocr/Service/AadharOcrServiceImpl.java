@@ -1,5 +1,8 @@
 package com.psl.pancard_ocr.Service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,6 +35,9 @@ public class AadharOcrServiceImpl {
 	
 	public AadharCardDetails getAadharCardDetails(MultipartFile fileToBeParsed){
 		
+		//Re-initialize AadharCardDetails Object
+		aadharCardDetails.reInitializeAadharObject();
+		
 		//JSON parser object to parse read file
 		JSONParser jsonParser = new JSONParser();
 		DateValidator validator = new DateValidator();
@@ -47,10 +53,15 @@ public class AadharOcrServiceImpl {
 			
 			jsonResponse = jsonArrayGenerator.getJSONArray(fileToBeParsed);
 			
-			
 			if(jsonResponse != null)
 			{
-				System.out.println("Received Json Response..!!");
+					
+			System.out.println("Received Json Response..!!");
+			
+			//get Image URL
+			String imgUrl = jsonArrayGenerator.getFilePathFromFolder(fileToBeParsed);	
+			aadharCardDetails.setImgUrl(imgUrl);
+				
 			//Read JSON file
 			Object obj = jsonParser.parse(jsonResponse); 
 			long top ;
@@ -244,4 +255,6 @@ public class AadharOcrServiceImpl {
 		return sb.toString().trim();
 			
 	}
+	
+	
 }

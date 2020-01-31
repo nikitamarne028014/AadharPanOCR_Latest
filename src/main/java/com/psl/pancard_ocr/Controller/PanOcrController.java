@@ -4,6 +4,7 @@ package com.psl.pancard_ocr.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ import com.psl.pancard_ocr.DTO.PanCardDetails;
 import com.psl.pancard_ocr.Service.AadharOcrServiceImpl;
 import com.psl.pancard_ocr.Service.PanOcrServiceImpl;
 
+@CrossOrigin
 @RestController
 public class PanOcrController {
 	
