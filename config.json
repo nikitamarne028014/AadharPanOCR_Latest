@@ -1,0 +1,5 @@
+{ 
+   
+"OCR_API_URL":"http://10.53.16.165:3500/upload",
+"AADHAR_PAN_IMAGES_FOLDER_PATH":"C:/Users/nikita_marne/Desktop/AadharPanImages"
+}
