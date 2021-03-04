@@ -1,0 +1,10 @@
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Util\PanOcrConstants.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\DTO\PanCardDetails.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Service\PanOcrServiceImpl.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Util\AadharOcrConstants.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Controller\PanOcrController.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\DTO\AadharCardDetails.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Service\AadharOcrServiceImpl.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\PanCardOcrApplication.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Utility\DateValidator.java
+D:\Java Practice\PanCardOCR\src\main\java\com\psl\pancard_ocr\Utility\JSONArrayGenerator.java

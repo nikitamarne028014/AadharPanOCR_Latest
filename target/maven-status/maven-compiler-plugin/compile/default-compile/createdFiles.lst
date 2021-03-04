@@ -1,0 +1,10 @@
+com\psl\pancard_ocr\Util\PanOcrConstants.class
+com\psl\pancard_ocr\DTO\AadharCardDetails.class
+com\psl\pancard_ocr\PanCardOcrApplication.class
+com\psl\pancard_ocr\Utility\DateValidator.class
+com\psl\pancard_ocr\Service\AadharOcrServiceImpl.class
+com\psl\pancard_ocr\Service\PanOcrServiceImpl.class
+com\psl\pancard_ocr\Utility\JSONArrayGenerator.class
+com\psl\pancard_ocr\DTO\PanCardDetails.class
+com\psl\pancard_ocr\Util\AadharOcrConstants.class
+com\psl\pancard_ocr\Controller\PanOcrController.class
